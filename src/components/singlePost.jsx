@@ -109,8 +109,11 @@ export default class SinglePost extends Component {
     };
 
     onComment = json =>{
+        const comments = this.state.comments;
+        comments.unshift(json);
+        console.log(comments);
         this.setState({
-            comments: this.state.comments.unshift(json)
+            comments: comments
         });
     };
 

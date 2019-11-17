@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import './style.css';
 import SinglePost from "./singlePost";
-import {onDeleteInServer, serverGetPosts} from "./severCall";
+import {addPostToServer, onDeleteInServer, serverGetPosts} from "./severCall";
+import {Button, Form} from "react-bootstrap";
 
 
 export default class Post extends Component {
@@ -11,7 +12,10 @@ export default class Post extends Component {
             isLoadingPost: true,
             isLoadingComment: true,
             comments: [],
-            posts: []
+            posts: [],
+            addPost:false,
+            addTitle:"",
+            addBody:""
         }
     }
 
@@ -46,9 +50,21 @@ export default class Post extends Component {
     }
 
     render() {
+        const {addPost} = this.state;
         return (
             <div>
                 <h4>Posts</h4>
+                <button className={"btn"} style={{width:"auto", backgroundColor:"aliceblue"}} onClick={()=>this.setState({addPost: !addPost})}>{!addPost ?"Add New Post":"cancel"}</button>
+                {this.state.addPost &&
+                <Form className={"post"}>
+                    <Form.Control id={"addTitle"} as="textarea" rows="2" placeholder={"title"} className={"editTitle"} onChange={ event => this.setState({addTitle:event.target.value})}/>
+                    <Form.Control id={"addBody"} as="textarea" className={"editTitle"} placeholder={"body"} rows={"4"} onChange={event => this.setState({addBody:event.target.value})}/>
+                    <Button className={"btn"} onClick={(e)=>{
+                                                             addPostToServer(this.state.addTitle,this.state.addBody,1,this.onAddPost);
+
+                    }} >Save</Button>
+                </Form>
+                }
                 {this.state.isLoadingPost || this.state.isLoadingComment ?
                     <div className="loader">Loading...</div>
                     :
@@ -65,5 +81,14 @@ export default class Post extends Component {
         this.setState({
             posts:this.state.posts.filter((post)=>post.id !== postId)
         })
+    };
+
+    onAddPost = (post)=>{
+        const posts = this.state.posts;
+        posts.unshift(post);
+        this.setState({
+            posts:posts,
+            addPost: !this.state.addPost
+        });
     }
 }
