@@ -62,9 +62,9 @@ export default class Post extends Component {
                     <Form.Control id={"addTitle"} as="textarea" rows="2" placeholder={"title"} className={"editTitle"} onChange={ event => this.setState({addTitle:event.target.value})}/>
                     <Form.Control id={"addBody"} as="textarea" className={"editTitle"} placeholder={"body"} rows={"4"} onChange={event => this.setState({addBody:event.target.value})}/>
                     <Button className={"btn"}
-                            onClick={(e)=>{addPostToServer(this.state.addTitle,this.state.addBody,1,this.onAddPost);
-
-                    }} >Save</Button>
+                            onClick={()=>{addPostToServer(this.state.addTitle,this.state.addBody,1,this.onAddPost);
+                                            this.setState({isLoadingPost:true})
+                                           }} >Save</Button>
                 </Form>
                 }
                 {this.state.isLoadingPost || this.state.isLoadingComment ?
@@ -87,12 +87,11 @@ export default class Post extends Component {
     };
 
     onAddPost = (post)=>{
-        console.log(post);
         // this.state.posts.unshift(post);
         this.setState({
             posts: [post].concat(this.state.posts),
             addPost: !this.state.addPost
-        },()=>{console.log(this.state.posts)});
+        },()=>{        this.setState({isLoadingPost:false})});
 
     }
 }

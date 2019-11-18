@@ -23,7 +23,6 @@ function serverGetCommentsById(postId,onComment) {
 }
 
 function addComment(postId,name,email,body,onComment) {
-    console.log("serverCall: "+postId);
     fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`, {
         method: 'POST',
         body: JSON.stringify({

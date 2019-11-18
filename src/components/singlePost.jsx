@@ -20,8 +20,7 @@ export default class SinglePost extends Component {
         }
     }
     componentDidMount() {
-        console.log(this.props);
-        serverGetCommentsById(this.props.id,this.getComments);
+        serverGetCommentsById(this.state.id,this.getComments);
 
     }
 
@@ -78,7 +77,7 @@ export default class SinglePost extends Component {
         });
     };
 
-    onAddComment=(e, post)=> {
+    onAddComment=(post)=> {
         addComment(post.id,this.state.name,this.state.email,this.state.commentBody,this.onComment);
     };
 
@@ -108,7 +107,7 @@ export default class SinglePost extends Component {
                         <Button className={"btn"} onClick={(e)=>this.onEditPost(e,post)} >Save</Button>
                     </Form>
                 }
-                {editable && <Button className={"btn"} onClick={event=>{
+                {editable && <Button className={"btn"} onClick={()=>{
                     this.setState({editable:false});
                     onDeletePost(post.id);
                 }}>Remove</Button>}
@@ -122,7 +121,7 @@ export default class SinglePost extends Component {
                             <Form.Control as="input"  placeholder={"Your Name"} className={"editTitle"} style={{border:"2px solid"}} onChange={event=>this.handleName(event)}/>
                             <Form.Control as="input" className={"editTitle"} placeholder={"Your@email.com"} style={{border:"2px solid"}} onChange={event=>this.handleMail(event)}/>
                             <Form.Control as="textarea" className={"editTitle"} placeholder={"Your Comment"} rows={"4"} style={{resize:"vertical",border:"2px solid"}} onChange={event=>this.handleCommentBody(event)}/>
-                            <Button className={"btn"} onClick={(e)=>this.onAddComment(e,post)} >Add</Button>
+                            <Button className={"btn"} onClick={()=>this.onAddComment(post)} >Add</Button>
                         </Form>
                         {comments.map((comment, i) => <SingleComment comment={comment} key={i}/>)}
                     </div>
