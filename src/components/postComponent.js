@@ -10,12 +10,13 @@ export default class Post extends Component {
         super(props);
         this.state = {
             isLoadingPost: true,
-            isLoadingComment: true,
+            isLoadingComment: false,
             comments: [],
             posts: [],
             addPost:false,
             addTitle:"",
-            addBody:""
+            addBody:"",
+            currentId:0
         }
     }
 
@@ -28,10 +29,12 @@ export default class Post extends Component {
             });
 
 
-            type === "comments" && this.setState({
-                comments: success,
-                isLoadingComment: false
-            });
+            if (type === "comments"){
+                this.setState({
+                    comments: success,
+                    isLoadingComment: false
+                });
+            }
 
 
     };
@@ -40,13 +43,10 @@ export default class Post extends Component {
         serverGetPosts("posts", this.onSuccess);
 
     };
-    getDataComments = () => {
-        serverGetPosts("comments", this.onSuccess);
-    };
+
 
     componentDidMount() {
-        setTimeout(() => this.getDataPosts(), 3000);
-        this.getDataComments();
+        this.getDataPosts();
     }
 
     render() {
@@ -54,13 +54,15 @@ export default class Post extends Component {
         return (
             <div>
                 <h4>Posts</h4>
-                <button className={"btn"} style={{width:"auto", backgroundColor:"aliceblue"}} onClick={()=>this.setState({addPost: !addPost})}>{!addPost ?"Add New Post":"cancel"}</button>
+                <button className={"btn"}
+                        style={{width:"auto", backgroundColor:"aliceblue"}}
+                        onClick={()=>this.setState({addPost: !addPost})}>{!addPost ?"Add New Post":"cancel"}</button>
                 {this.state.addPost &&
                 <Form className={"post"}>
                     <Form.Control id={"addTitle"} as="textarea" rows="2" placeholder={"title"} className={"editTitle"} onChange={ event => this.setState({addTitle:event.target.value})}/>
                     <Form.Control id={"addBody"} as="textarea" className={"editTitle"} placeholder={"body"} rows={"4"} onChange={event => this.setState({addBody:event.target.value})}/>
-                    <Button className={"btn"} onClick={(e)=>{
-                                                             addPostToServer(this.state.addTitle,this.state.addBody,1,this.onAddPost);
+                    <Button className={"btn"}
+                            onClick={(e)=>{addPostToServer(this.state.addTitle,this.state.addBody,1,this.onAddPost);
 
                     }} >Save</Button>
                 </Form>
@@ -68,10 +70,11 @@ export default class Post extends Component {
                 {this.state.isLoadingPost || this.state.isLoadingComment ?
                     <div className="loader">Loading...</div>
                     :
-                    this.state.posts.map((post, i) => <SinglePost post={post}
+                    this.state.posts.map((post, i) =><SinglePost post={post}
+                                                                  id={post.id}
                                                                   key={i}
-                                                                  comments={this.state.comments.filter((comment) => comment.postId === post.id)}
-                                                                  onDeletePost={this.onDeletePost}/>)}
+                                                                  onDeletePost={this.onDeletePost}
+                                                                  />)}
             </div>
         )
     }
@@ -84,11 +87,12 @@ export default class Post extends Component {
     };
 
     onAddPost = (post)=>{
-        const posts = this.state.posts;
-        posts.unshift(post);
+        console.log(post);
+        // this.state.posts.unshift(post);
         this.setState({
-            posts:posts,
+            posts: [post].concat(this.state.posts),
             addPost: !this.state.addPost
-        });
+        },()=>{console.log(this.state.posts)});
+
     }
 }

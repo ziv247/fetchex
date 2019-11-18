@@ -10,8 +10,21 @@ function serverGetPosts(url,onSuccess) {
     ).catch(error => console.log(error));
 }
 
+function serverGetCommentsById(postId,onComment) {
+    fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`, {
+            method: 'GET',
+        }
+    ).then(response => response.json()
+    ).then(success => {
+        // console.log(success);
+            onComment(success);
+        }
+    ).catch(error => console.log(error));
+}
+
 function addComment(postId,name,email,body,onComment) {
-    fetch(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`, {
+    console.log("serverCall: "+postId);
+    fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`, {
         method: 'POST',
         body: JSON.stringify({
             "postId": postId,
@@ -24,10 +37,7 @@ function addComment(postId,name,email,body,onComment) {
         }
     })
         .then(response => response.json())
-        .then(json => onComment(json))
-        .then(success => {
-            console.log("Success: ",success);
-        })
+        .then(success => onComment(success))
 }
 
 function updatePost(post) {
@@ -71,7 +81,7 @@ function addPostToServer(title,body,userId,onAddPost) {
         }
     })
         .then(response => response.json())
-        .then(json => onAddPost(json)).then(success => console.log("Success: "+success))
+        .then(success => onAddPost(success))
 }
 
 
@@ -79,4 +89,4 @@ function addPostToServer(title,body,userId,onAddPost) {
 
 
 
-export {serverGetPosts,updatePost,addComment,onDeleteInServer,addPostToServer};
+export {serverGetPosts,updatePost,addComment,onDeleteInServer,addPostToServer,serverGetCommentsById};

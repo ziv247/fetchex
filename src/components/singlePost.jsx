@@ -2,36 +2,95 @@ import React, {Component} from 'react';
 import './style.css';
 import SingleComment from "./singleComment";
 import {Button, Form} from "react-bootstrap";
-import {addComment, updatePost} from "./severCall";
+import {addComment, serverGetCommentsById, updatePost} from "./severCall";
 
 export default class SinglePost extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            id:props.id,
             toggleComments: false,
             togglePosts: false,
             editable: false,
-            comments:props.comments,
+            comments: [],
             name:"",
             email:"",
             commentBody:""
         }
     }
+    componentDidMount() {
+        console.log(this.props);
+        serverGetCommentsById(this.props.id,this.getComments);
+
+    }
+
+    getComments= comments =>{
+        this.setState({comments: comments});
+    };
+
     onEditPost = (e, post) =>{
         e.preventDefault();
         updatePost(post);
         this.setState({editable:false});
     };
 
+    handleTitle =(event)=> {
+        this.props.post.title = event.target.value;
+    };
+
+    handleBody =(event)=> {
+        this.props.post.body = event.target.value;
+    };
+
+    handleName = event =>{
+        this.setState({name:event.target.value})
+    };
+
+    handleMail = event =>{
+        this.setState({email:event.target.value})
+    };
+
+    handleCommentBody = event =>{
+        this.setState({commentBody:event.target.value})
+    };
+
+    showComments = () => {
+        this.setState({
+            toggleComments: !this.state.toggleComments
+        })
+    };
+
+    onSuccess = (success) => {
+        this.setState({
+            comments: success,
+            isLoadingComment: false
+        });
+
+
+    };
+
+    onComment = comment =>{
+        const comments = this.state.comments;
+        comments.unshift(comment);
+        this.setState({
+            comments: comments
+        });
+    };
+
+    onAddComment=(e, post)=> {
+        addComment(post.id,this.state.name,this.state.email,this.state.commentBody,this.onComment);
+    };
+
+
     render() {
-        let {post, comments,onDeletePost} = this.props;
-        const {toggleComments, togglePosts, editable} = this.state;
+        let {post, onDeletePost} = this.props;
+        const {comments,toggleComments, togglePosts, editable} = this.state;
         return (
             <div className={"post"}>
                 {!editable ?
                     <div>
-                        <h5 onClick={() => {this.setState({togglePosts: !togglePosts})}}>
+                        <h5 onClick={() => {this.setState({togglePosts: !togglePosts})}} style={{cursor:"pointer"}}>
                             {post.title}
                         </h5>
                         {togglePosts
@@ -72,54 +131,6 @@ export default class SinglePost extends Component {
         )
 
     }
-
-    handleTitle =(event)=> {
-        this.props.post.title = event.target.value;
-    };
-
-    handleBody =(event)=> {
-        this.props.post.body = event.target.value;
-    };
-
-    handleName = event =>{
-        this.setState({name:event.target.value})
-    };
-
-    handleMail = event =>{
-        this.setState({email:event.target.value})
-    };
-
-    handleCommentBody = event =>{
-        this.setState({commentBody:event.target.value})
-    };
-
-    showComments = () => {
-        this.setState({
-            toggleComments: !this.state.toggleComments
-        })
-    };
-
-    onSuccess = (success) => {
-         this.setState({
-            comments: success,
-            isLoadingComment: false
-        });
-
-
-    };
-
-    onComment = json =>{
-        const comments = this.state.comments;
-        comments.unshift(json);
-        console.log(comments);
-        this.setState({
-            comments: comments
-        });
-    };
-
-    onAddComment=(e, post)=> {
-        addComment(post.id,this.state.name,this.state.email,this.state.commentBody,this.onComment);
-    };
 
 
 }
